@@ -1,0 +1,62 @@
+<?xml version="1.0" ?>
+<mxfile host="app.diagrams.net">
+  <diagram name="Smart GeoAPI">
+    <mxGraphModel dx="1420" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="box0" value="Frontend (Client)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="20" y="40" width="160" height="50" as_="geometry"/>
+        </mxCell>
+        <mxCell id="box1" value="AI Query Input" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="40" y="100" width="160" height="50" as_="geometry"/>
+        </mxCell>
+        <mxCell id="box2" value="AI Interpretation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="280" y="40" width="160" height="50" as_="geometry"/>
+        </mxCell>
+        <mxCell id="box3" value="OPENAI GPT-4 API" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="300" y="100" width="160" height="50" as_="geometry"/>
+        </mxCell>
+        <mxCell id="box4" value="/FeatureServer/0/query" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="300" y="190" width="160" height="50" as_="geometry"/>
+        </mxCell>
+        <mxCell id="box5" value="Backend (Express API)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="520" y="40" width="160" height="50" as_="geometry"/>
+        </mxCell>
+        <mxCell id="box6" value="Data Layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="300" y="310" width="160" height="50" as_="geometry"/>
+        </mxCell>
+        <mxCell id="box7" value="Google Sheets" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="540" y="310" width="160" height="50" as_="geometry"/>
+        </mxCell>
+        <mxCell id="box8" value="Filtered Features" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="40" y="310" width="160" height="50" as_="geometry"/>
+        </mxCell>
+        <mxCell id="e1" style="endArrow=block;html=1;strokeColor=#000000" edge="1" parent="1" source="box0" target="box1">
+          <mxGeometry relative="1" as_="geometry"/>
+        </mxCell>
+        <mxCell id="e2" style="endArrow=block;html=1;strokeColor=#000000" edge="1" parent="1" source="box1" target="box3">
+          <mxGeometry relative="1" as_="geometry"/>
+        </mxCell>
+        <mxCell id="e3" style="endArrow=block;html=1;strokeColor=#000000" edge="1" parent="1" source="box3" target="box4">
+          <mxGeometry relative="1" as_="geometry"/>
+        </mxCell>
+        <mxCell id="e4" style="endArrow=block;html=1;strokeColor=#000000" edge="1" parent="1" source="box4" target="box6">
+          <mxGeometry relative="1" as_="geometry"/>
+        </mxCell>
+        <mxCell id="e5" style="endArrow=block;html=1;strokeColor=#000000" edge="1" parent="1" source="box4" target="box5">
+          <mxGeometry relative="1" as_="geometry"/>
+        </mxCell>
+        <mxCell id="e6" style="endArrow=block;html=1;strokeColor=#000000" edge="1" parent="1" source="box6" target="box8">
+          <mxGeometry relative="1" as_="geometry"/>
+        </mxCell>
+        <mxCell id="e7" style="endArrow=block;html=1;strokeColor=#000000" edge="1" parent="1" source="box8" target="box0">
+          <mxGeometry relative="1" as_="geometry"/>
+        </mxCell>
+        <mxCell id="e8" style="endArrow=block;html=1;strokeColor=#000000" edge="1" parent="1" source="box4" target="box7">
+          <mxGeometry relative="1" as_="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

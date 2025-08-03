@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Smart GeoAPI Viewer</title>
+  <link rel="stylesheet" href="https://js.arcgis.com/4.29/esri/themes/light/main.css" />
+  <script src="https://js.arcgis.com/4.29/"></script>
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; }
+    #viewDiv { height: 90vh; width: 100vw; }
+    #queryBar {
+      padding: 10px;
+      background: #f7f7f7;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    #whereInput {
+      flex-grow: 1;
+      padding: 8px;
+      font-size: 1rem;
+    }
+    button {
+      padding: 8px 12px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="queryBar">
+    <input id="whereInput" type="text" placeholder="Show me parks after 2022" />
+    <button onclick="runQuery()">AI Query</button>
+  </div>
+  <div id="viewDiv"></div>
+
+  <script>
+    let map, view, layer, FeatureLayer;
+
+    require([
+      "esri/Map",
+      "esri/views/MapView",
+      "esri/layers/FeatureLayer",
+      "esri/widgets/LayerList",
+      "esri/layers/TileLayer",
+    ], (Map, MapView, _FeatureLayer, LayerList, TileLayer) => {
+      FeatureLayer = _FeatureLayer;
+
+      const imageryLayer = new TileLayer({
+        url: "https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer"
+      });
+
+      map = new Map({ layers: [imageryLayer] });
+
+      view = new MapView({
+        container: "viewDiv",
+        map: map,
+        center: [18.065,59.33],
+        zoom: 13
+      });
+
+      layer = new FeatureLayer({
+        url: "http://localhost:3000/FeatureServer/0",
+        outFields: ["*"],
+        popupTemplate: {
+          title: "{name}",
+          content: (feature) => {
+            const props = feature.graphic.attributes;
+            return `
+              <b>ID:</b> ${props.id}<br/>
+              <b>Type:</b> ${props.type}<br/>
+              <b>Year:</b> ${props.year}<br/>
+              <b>Change:</b> ${props.change || "None"}
+            `;
+          }
+        },
+        renderer: {
+          type: "simple",
+          symbol: {
+            type: "simple-fill",
+            color: [255, 255, 204, 0.5],
+            outline: {
+              color: [0, 0, 0],
+              width: 1
+            }
+          }
+        }
+      });
+
+      map.add(layer);
+
+      const layerList = new LayerList({ view: view });
+      view.ui.add(layerList, "top-right");
+    });
+
+   async function runQuery() {
+  const input = document.getElementById("whereInput").value;
+  if (!input.trim()) return;
+
+  try {
+    const clauseResponse = await fetch("http://localhost:3000/FeatureServer/0/interpret", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query: input })
+    });
+
+    const clauseResult = await clauseResponse.json();
+    const interpreted = clauseResult.interpreted.replace(/^"+|"+$/g, '').trim();
+
+    console.log(`AI query "${input}" generated WHERE clause: ${interpreted}`);
+
+    // Apply filter
+    await layer.when();
+    layer.definitionExpression = interpreted;
+
+    // Query matching features
+    const query = layer.createQuery();
+    query.where = interpreted;
+    query.returnGeometry = true;
+
+    const result = await layer.queryFeatures(query);
+
+    if (result.features.length > 0) {
+      const geometries = result.features.map(f => f.geometry);
+      const extent = geometries[0].extent.clone();
+      for (let i = 1; i < geometries.length; i++) {
+        extent.union(geometries[i].extent);
+      }
+      view.goTo(extent.expand(1.5));
+    } else {
+      alert("No matching features found.");
+    }
+
+  } catch (err) {
+    console.error("Query failed:", err);
+    alert("Failed to interpret or apply query.");
+  }
+}
+
+
+  </script>
+</body>
+</html>

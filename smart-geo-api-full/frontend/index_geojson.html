@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Smart GeoAPI Viewer</title>
+  <link rel="stylesheet" href="https://js.arcgis.com/4.29/esri/themes/light/main.css" />
+  <script src="https://js.arcgis.com/4.29/"></script>
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; }
+    #viewDiv { height: 90vh; width: 100vw; }
+    #queryBar {
+      padding: 10px;
+      background: #f7f7f7;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    #queryInput {
+      flex-grow: 1;
+      padding: 8px;
+      font-size: 1rem;
+    }
+    button {
+      padding: 8px 12px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="queryBar">
+    <input id="queryInput" type="text" placeholder="Ask something like 'show updated parks after 2022'" />
+    <button onclick="runSmartQuery()">Search</button>
+  </div>
+  <div id="viewDiv"></div>
+
+  <script>
+    let map, view, geojsonLayer;
+
+    require([
+      "esri/Map",
+      "esri/views/MapView",
+      "esri/layers/GeoJSONLayer"
+    ], (Map, MapView, GeoJSONLayer) => {
+
+      map = new Map({ basemap: "streets" });
+      view = new MapView({
+        container: "viewDiv",
+        map: map,
+        center: [55.15, 25.25],
+        zoom: 12
+      });
+    });
+
+    async function runSmartQuery() {
+      const queryText = document.getElementById("queryInput").value;
+      if (!queryText) return;
+
+      const response = await fetch("http://localhost:3000/smart-query", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: queryText })
+      });
+
+      const geojson = await response.json();
+      const blob = new Blob([JSON.stringify(geojson)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+
+      require(["esri/layers/GeoJSONLayer"], (GeoJSONLayer) => {
+        if (geojsonLayer) {
+          map.remove(geojsonLayer);
+        }
+
+        geojsonLayer = new GeoJSONLayer({
+          url,
+          popupTemplate: {
+            title: "{name}",
+            content: (feature) => {
+              const props = feature.graphic.attributes;
+              return `
+                <b>ID:</b> ${props.id}<br/>
+                <b>Type:</b> ${props.type}<br/>
+                <b>Year:</b> ${props.year}<br/>
+                <b>Change:</b> ${props.change || "None"}
+              `;
+            }
+          }
+        });
+
+        map.add(geojsonLayer);
+      });
+    }
+  </script>
+</body>
+</html>
